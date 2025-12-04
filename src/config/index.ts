@@ -16,10 +16,10 @@ export function loadConfig(): Config {
   return {
     anthropicApiKey,
     pdfPaths: [
-      '../../data/BE664472_SPC.pdf',
-      '../../data/EU-1-25-1941-001_SPC.pdf',
-      '../../data/PL41203-0011_SPC.pdf'
+      'I:/Grownup Stuff/Work/Metly/interview-hanneri/data/BE664472_SPC.pdf',
+      'I:/Grownup Stuff/Work/Metly/interview-hanneri/data/EU-1-25-1941-001_SPC.pdf',
+      'I:/Grownup Stuff/Work/Metly/interview-hanneri/data/PL41203-0011_SPC.pdf'
     ],
-    outputDirectory: '../output'
+    outputDirectory: 'I:/Grownup Stuff/Work/Metly/interview-hanneri/results'
   };
 }

@@ -1,7 +1,7 @@
-import { ProcessingSummary } from '../types';
-import { PdfExtractor } from '../services/pdf-extractor';
-import { ClaudeService } from '../services/claude-service';
-import { ResultWriter } from '../services/result-writer';
+import { ProcessingSummary } from "../types";
+import { PdfExtractor } from "../services/pdf-extractor";
+import { ClaudeService } from "../services/claude-service";
+import { ResultWriter } from "../services/result-writer";
 
 export class PdfProcessor {
   private pdfExtractor: PdfExtractor;
@@ -30,26 +30,40 @@ export class PdfProcessor {
       try {
         const extractedText = await this.pdfExtractor.extractText(pdfPath);
         if (!extractedText) {
-          throw new Error('Text extraction failed');
+          throw new Error("Text extraction failed");
         }
 
-        console.log('  - Text extracted');
+        console.log("  - Text extracted");
 
         const analysis = await this.claudeService.analyze(extractedText);
         if (!analysis) {
-          throw new Error('Analysis failed');
+          throw new Error("Analysis failed");
         }
 
-        console.log('  - Analysis complete');
+        console.log("  - Analysis complete");
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        const translation = await this.claudeService.translate(analysis);
-        if (!translation) {
-          throw new Error('Translation failed');
+        const detectedLanguage = await this.claudeService.detectLanguage(
+          analysis
+        );
+        console.log(`  - Detected language: ${detectedLanguage}`);
+
+        let translation = analysis;
+        if (
+          detectedLanguage &&
+          !detectedLanguage.toLowerCase().includes("english")
+        ) {
+          translation = await this.claudeService.translate(analysis) || "";
+          if (!translation) {
+            throw new Error("Translation failed");
+          }
+          console.log("  - Translation complete");
+        } else {
+          console.log("  - Skipping translation (already in English)");
         }
 
-        console.log('  - Translation complete');
+        console.log("  - Translation complete");
 
         const result = {
           sourcePdf: pdfPath,
@@ -57,20 +71,20 @@ export class PdfProcessor {
           originalText: extractedText,
           analysis: analysis,
           translation: translation,
-          success: true
+          success: true,
         };
 
         await this.resultWriter.writeResult(result);
         successCount++;
-
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
         console.error(`✗ Failed: ${errorMessage}`);
         errors.push({ pdf: pdfPath, error: errorMessage });
         failureCount++;
       }
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
     const duration = Date.now() - startTime;
@@ -80,7 +94,7 @@ export class PdfProcessor {
       successCount,
       failureCount,
       errors,
-      duration
+      duration,
     };
   }
 }
