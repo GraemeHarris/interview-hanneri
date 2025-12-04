@@ -15,7 +15,13 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@types/pdf-parse": "^1.1.5",
     "tsx": "^4.0.0",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "dotenv": "^16.4.5",
+    "pdf-parse": "^1.1.4"
   }
 }
